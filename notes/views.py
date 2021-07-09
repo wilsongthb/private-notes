@@ -7,6 +7,7 @@ from notes import serializers, models
 from notes.models import Note
 from django.http import HttpResponse
 from datetime import datetime
+from django.db.models import F
 
 # Create your views here.
 
@@ -69,10 +70,17 @@ class ProgramActivityViewSet(viewsets.ModelViewSet):
 #      permission_classes = [permissions.IsAuthenticated]
 
 class PaymentViewSet(viewsets.ModelViewSet):
-    queryset = models.Payment.objects.all()
+    queryset = models.Payment.objects.all().filter(deleted_at__isnull=True)
     serializer_class = serializers.PaymentSerializer
     permission_classes = [permissions.IsAuthenticated]
     filterset_fields = ['contact_id', 'note_id']
+
+    def destroy(self, request, pk=None):
+        pay = models.Payment.objects.get(pk=pk)
+        pay.deleted_at = datetime.now()
+        pay.save()
+        pay.note.calculateAmountPaid()
+        return HttpResponse('deleted ' + pk)
 
 
 class NoteViewSet(viewsets.ModelViewSet):
@@ -89,6 +97,9 @@ class NoteViewSet(viewsets.ModelViewSet):
         created_date = self.request.query_params.get('date')
         if created_date is not None:
             queryset = queryset.filter(init_at__date=created_date)
+        debts = self.request.query_params.get('debts')
+        if debts is not None:
+            queryset = queryset.filter(amount__gt=F('amount_paid'))
         return queryset
 
     #  def create(self, request):

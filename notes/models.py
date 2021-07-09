@@ -3,6 +3,8 @@ from django.core.validators import validate_slug
 from datetime import date, timedelta, datetime
 from string import Template
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Sum
+from notes.utils import deadline_in_business_days
 # Create your models here.
 
 
@@ -35,7 +37,7 @@ class Contact(BaseModel):
     phone_number = models.CharField(max_length=15)
     email = models.CharField(max_length=255, null=True)  # opcional
     address = models.CharField(max_length=255, null=True)  # opcional
-    dni = models.CharField(max_length=8, null=True)  # en caso de personas
+    dni = models.CharField(max_length=15, null=True)  # en caso de personas
 
     def __str__(self):
         #  return '%s: %s' % (self.phone_number, self.name)
@@ -115,14 +117,20 @@ class Note(BaseModel):
     def program_slug(self):
         return self.program.slug if self.program_id is not None else None
 
+    def calculateAmountPaid(self):
+        amountPaid = Payment.objects.filter(note_id=self.id).filter(deleted_at__isnull=True).aggregate(Sum('amount'))['amount__sum']
+        self.amount_paid = amountPaid if amountPaid is not None else 0
+        self.save()
+
     def addActivitiesFromProgram(self, program_id):
         program = Program.objects.get(id=program_id)
         programActivities = ProgramActivity.objects.filter(
             program_id=program_id)
         if len(programActivities) > 0:
             for activity in programActivities:
-                daysToAdd = timedelta(activity.days)
-                init_at = self.init_at + daysToAdd
+                #  daysToAdd = timedelta(activity.days)
+                #  init_at = self.init_at + daysToAdd
+                init_at = deadline_in_business_days(self.init_at, activity.days, [5, 6])
                 template = Template(activity.activity)
                 futureNote = Note(
                     patern_note_id=self.id,

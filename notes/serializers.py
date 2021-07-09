@@ -80,10 +80,8 @@ class PaymentSerializer(serializers.HyperlinkedModelSerializer):
     def create(self, validated_data):
         payment = models.Payment(**validated_data)
         payment.save()
-        amountPaid = models.Payment.objects.filter(note_id=payment.note_id).aggregate(Sum('amount'))['amount__sum']
         note = models.Note.objects.get(pk=payment.note_id)
-        note.amount_paid = amountPaid
-        note.save()
+        note.calculateAmountPaid()
         return payment
 
     #  def update(self, instance, validated_data):
