@@ -16,29 +16,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import url
-from notes import views
-from rest_framework import routers
 from expo_agency.api_routes import router as expo_agency_routes
+from expo_agency.views import get_current_client
+from notes.api_urls import router as notes_api_routes
 from django.conf.urls.static import static
 from django.conf import settings
 
-router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
-#  router.register(r'entities', views.EntityViewSet)
-router.register(r'contacts', views.ContactViewSet)
-router.register(r'programs', views.ProgramViewSet)
-router.register(r'program-activities', views.ProgramActivityViewSet)
-router.register(r'notes', views.NoteViewSet)
-#  router.register(r'note-payments', views.NotePaymentViewSet)
-router.register(r'payments', views.PaymentViewSet)
-#  router.register(r'note-activities', views.NoteActivityViewSet)
+
 
 urlpatterns = [
-    path('', views.index),
+    #  path('', views.index),
     # login de la vista del api
     path('api-auth/', include('rest_framework.urls')),
-    path('api/', include(router.urls)),
+    path('api/', include(notes_api_routes.urls)),
+    path('api_expo_agency/clients/me/', get_current_client),
+    #  path('api_expo_agency/me/', get_current_user),
     path('api_expo_agency/', include(expo_agency_routes.urls)),
     path('admin/', admin.site.urls),
     # user profile ref: https://djoser.readthedocs.io/en/latest/base_endpoints.html

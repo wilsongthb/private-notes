@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django_seed',
     'django_extensions',
     'expo_agency',
+    #  'customuser'
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+#  AUTH_USER_MODEL = 'customuser.User'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -151,7 +154,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend', 'rest_framework.filters.SearchFilter']
 }
 
 # autentication con email
@@ -164,3 +167,5 @@ MEDIA_URL = 'uploads/'
 
 #  CORS_ALLOW_ALL_ORIGINS = True
 #  CORS_URLS_REGEX = r'^/api/.*$'
+
+#  DATE_INPUT_FORMATS = ('%Y-%m-%d', '%Y/%/m%/%d')
