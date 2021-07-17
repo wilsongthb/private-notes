@@ -135,3 +135,11 @@ class NoteViewSet(viewsets.ModelViewSet):
 #      def destroy(self, request, pk=None):
 #          Note.objects.filter(id=pk).update(deleted_at=datetime.now())
 #          return HttpResponse('deleted ' + pk)
+
+
+class AnnotationViewSet(viewsets.ModelViewSet):
+    queryset = models.Annotation.objects.all().filter(deleted_at__isnull=True)
+    serializer_class = serializers.AnnotationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_fields = ['date', 'type']
+    search_fields = ['text', 'date']

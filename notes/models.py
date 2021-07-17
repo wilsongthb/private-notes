@@ -5,6 +5,7 @@ from string import Template
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum
 from notes.utils import deadline_in_business_days
+from django.contrib.auth.models import User
 # Create your models here.
 
 
@@ -118,7 +119,8 @@ class Note(BaseModel):
         return self.program.slug if self.program_id is not None else None
 
     def calculateAmountPaid(self):
-        amountPaid = Payment.objects.filter(note_id=self.id).filter(deleted_at__isnull=True).aggregate(Sum('amount'))['amount__sum']
+        amountPaid = Payment.objects.filter(note_id=self.id).filter(
+            deleted_at__isnull=True).aggregate(Sum('amount'))['amount__sum']
         self.amount_paid = amountPaid if amountPaid is not None else 0
         self.save()
 
@@ -130,7 +132,8 @@ class Note(BaseModel):
             for activity in programActivities:
                 #  daysToAdd = timedelta(activity.days)
                 #  init_at = self.init_at + daysToAdd
-                init_at = deadline_in_business_days(self.init_at, activity.days, [5, 6])
+                init_at = deadline_in_business_days(
+                    self.init_at, activity.days, [5, 6])
                 template = Template(activity.activity)
                 futureNote = Note(
                     patern_note_id=self.id,
@@ -151,29 +154,11 @@ class Payment(BaseModel):
         max_length=255, null=True)  # concepto opcional
 
 
-#  class NotePayment(models.Model):
-#      note = models.ForeignKey(Note, on_delete=models.CASCADE)
-#      payment = models.ForeignKey(ContactPayment, on_delete=models.CASCADE)
-
-#  class NoteActivity(BaseModel):
-#      note = models.ForeignKey(Note, on_delete=models.PROTECT)
-#      activity = models.ForeignKey(
-#          ProgramActivity, on_delete=models.PROTECT, null=True)
-#      observation = models.TextField(
-#          max_length=255, null=False, help_text='Texto descriptivo de la actividad')
-#      ini_time = models.DateTimeField(
-#          null=False, help_text="Fecha de inicio de la actividad")
-#      done_at = models.DateTimeField(null=True,
-#                                     default=None,
-#                                     help_text="Fecha de Realizacion")
-
-#      def contact_phone_number(self):
-#          return self.note.contact.phone_number
-
-#      def contact_name(self):
-#          return self.note.contact.name
-
-#      def __str__(self):
-#          return self.ini_time
-    #  end_time = models.DateTimeField(
-    #      null=True, help_text='Fecha de finalizacion, aplicable en ciertos casos')
+class Annotation(BaseModel):
+    text = models.TextField(max_length=500)
+    date = models.DateField()
+    reviewed_at = models.DateTimeField(
+        null=True, help_text="Fecha de entrada revisada")
+    type = models.PositiveSmallIntegerField(default=1)
+    patern_annotation_id = models.PositiveIntegerField(null=True)
+    user_id = models.ForeignKey(User, on_delete=models.PROTECT)
