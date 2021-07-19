@@ -89,7 +89,7 @@ class AnnotationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Annotation
         fields = ['created_at', 'text', 'date',
-                  'reviewed_at', 'type', 'user_id']
+                  'reviewed_at', 'type', 'user_id', 'id']
 
     #  def update(self, instance, validated_data):
     #      if instance.program_id != validated_data.get('program_id'):
