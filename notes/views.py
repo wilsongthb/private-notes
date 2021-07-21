@@ -1,13 +1,14 @@
 from django.db import transaction
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User, Group
-from rest_framework import viewsets
-from rest_framework import permissions, filters
+from rest_framework import viewsets, permissions, filters
+from rest_framework.response import Response
 from notes import serializers, models
 from notes.models import Note
 from django.http import HttpResponse
 from datetime import datetime
 from django.db.models import F
+from rest_framework.renderers import JSONRenderer
 
 # Create your views here.
 
@@ -143,3 +144,20 @@ class AnnotationViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filterset_fields = ['date', 'type']
     search_fields = ['text', 'date']
+
+    #  def create(self, request):
+        #  serializer = serializers.AnnotationSerializer(data=request.data)
+        #  print("✅ gaa cuchito")
+        #  # print(serializer.data
+        #  serializer.is_valid()
+        #  serializer.save()
+        #  print("✅ aguia")
+        #  response = Response()
+        #  response.status_code = 201
+        #  return response
+
+    def destroy(self, request, pk=None):
+        row = models.Annotation.objects.get(pk=pk)
+        row.deleted_at = datetime.now()
+        row.save()
+        return HttpResponse('')

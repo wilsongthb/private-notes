@@ -91,6 +91,11 @@ class AnnotationSerializer(serializers.ModelSerializer):
         fields = ['created_at', 'text', 'date',
                   'reviewed_at', 'type', 'user_id', 'id']
 
+    #  def create(self, validated_data):
+    #      instance = models.Annotation(**validated_data)
+    #      instance.save()
+    #      return instance
+
     #  def update(self, instance, validated_data):
     #      if instance.program_id != validated_data.get('program_id'):
     #          print("mucho ojo cuate");

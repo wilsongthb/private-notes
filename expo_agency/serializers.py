@@ -36,6 +36,8 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.HyperlinkedModelSerializer):
     activities = TourActivitySerializer(many=True, read_only=True)
     gallery = ProductImageSerializer(many=True, read_only=True)
+    services = serializers.StringRelatedField(many=True)
+    advices = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Product
@@ -51,7 +53,9 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
             'rating',
             'location',
             'activities',
-            'gallery'
+            'gallery',
+            'services',
+            'advices'
         ]
 
 

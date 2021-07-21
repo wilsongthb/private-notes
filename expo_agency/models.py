@@ -123,6 +123,29 @@ class ProductImage(BaseModel):
         ordering = ['order']
 
 
+class ProductService(models.Model):
+    """
+    Lista de servicios
+    """
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="services")
+    text = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.text
+
+
+class ProductAdvice(models.Model):
+    """
+    Lista de avisos
+    """
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="advices")
+    text = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.text
+
 #  class ReserveAdition(BaseModel):
 #      reserve = models.ForeignKey(Reserve, on_delete=models.CASCADE)
 #      product = models.ForeignKey(Product, on_delete=models.CASCADE)
