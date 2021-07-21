@@ -132,7 +132,7 @@ class ProductService(models.Model):
     text = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.text
+        return f"{self.product.name} - {self.text}"
 
 
 class ProductAdvice(models.Model):
@@ -144,7 +144,7 @@ class ProductAdvice(models.Model):
     text = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.text
+        return f"{self.product.name} - {self.text}"
 
 #  class ReserveAdition(BaseModel):
 #      reserve = models.ForeignKey(Reserve, on_delete=models.CASCADE)

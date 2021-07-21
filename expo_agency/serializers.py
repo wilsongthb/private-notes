@@ -36,8 +36,10 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.HyperlinkedModelSerializer):
     activities = TourActivitySerializer(many=True, read_only=True)
     gallery = ProductImageSerializer(many=True, read_only=True)
-    services = serializers.StringRelatedField(many=True)
-    advices = serializers.StringRelatedField(many=True)
+    services = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field='text')
+    advices = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field='text')
 
     class Meta:
         model = Product
@@ -86,7 +88,6 @@ class ReserveSerializer(serializers.HyperlinkedModelSerializer):
         read_only_fields = ['product']
 
     #  def update(self, instance, validated_data):
-        
 
 
 #  class UserSerializer(serializers.ModelSerializer):
