@@ -129,7 +129,7 @@ class ProductService(models.Model):
     """
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="services")
-    text = models.CharField(max_length=255)
+    text = models.CharField(max_length=500)
 
     def __str__(self):
         return f"{self.product.name} - {self.text}"
@@ -141,7 +141,7 @@ class ProductAdvice(models.Model):
     """
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="advices")
-    text = models.CharField(max_length=255)
+    text = models.CharField(max_length=500)
 
     def __str__(self):
         return f"{self.product.name} - {self.text}"

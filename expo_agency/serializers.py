@@ -40,6 +40,7 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
         many=True, read_only=True, slug_field='text')
     advices = serializers.SlugRelatedField(
         many=True, read_only=True, slug_field='text')
+    rating = serializers.IntegerField()
 
     class Meta:
         model = Product
