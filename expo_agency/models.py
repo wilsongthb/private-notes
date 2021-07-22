@@ -104,7 +104,8 @@ class Reserve(BaseModel):
     companion = models.PositiveSmallIntegerField(
         default=0, help_text="Numero de acompaniantes")
     request_message = models.TextField(
-        max_length=1000, help_text="Mensaje adiciona de solicitud", null=True)
+        max_length=1000, help_text="Mensaje adiciona de solicitud", null=True,
+        blank=True)
 
 
 class ProductImage(BaseModel):
