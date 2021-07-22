@@ -3,7 +3,7 @@ from rest_framework import serializers
 from expo_agency.models import Client, Product, Reserve, TourActivity, ProductImage
 
 
-class ClientSerializer(serializers.HyperlinkedModelSerializer):
+class ClientSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField()
 
     class Meta:
@@ -33,7 +33,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'order']
 
 
-class ProductSerializer(serializers.HyperlinkedModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     activities = TourActivitySerializer(many=True, read_only=True)
     gallery = ProductImageSerializer(many=True, read_only=True)
     services = serializers.SlugRelatedField(
@@ -62,12 +62,13 @@ class ProductSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class ReserveSerializer(serializers.HyperlinkedModelSerializer):
+class ReserveSerializer(serializers.ModelSerializer):
     client = ClientSerializer(many=False, read_only=True)
     client_id = serializers.IntegerField()
     #  product = ProductSerializer(many=False, read_only=True)
     product = serializers.StringRelatedField(many=False)
     product_id = serializers.IntegerField()
+    request_message = serializers.CharField(required=False)
 
     class Meta:
         model = Reserve
