@@ -68,7 +68,7 @@ class ReserveSerializer(serializers.ModelSerializer):
     #  product = ProductSerializer(many=False, read_only=True)
     product = serializers.StringRelatedField(many=False)
     product_id = serializers.IntegerField()
-    request_message = serializers.CharField(required=False)
+    request_message = serializers.CharField(required=False, allow_null=True)
 
     class Meta:
         model = Reserve
