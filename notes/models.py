@@ -158,7 +158,33 @@ class Annotation(BaseModel):
     text = models.TextField(max_length=500)
     date = models.DateField()
     reviewed_at = models.DateTimeField(
+        blank=True,
         null=True, help_text="Fecha de entrada revisada")
     type = models.PositiveSmallIntegerField(default=1)
-    patern_annotation_id = models.PositiveIntegerField(null=True)
+    patern_annotation_id = models.PositiveIntegerField(null=True, blank=True)
     user_id = models.ForeignKey(User, on_delete=models.PROTECT)
+    program = models.ForeignKey(
+        Program, on_delete=models.PROTECT,
+        null=True, blank=True,
+        default=None)
+    #  program_id = models.PositiveIntegerField(null=True)
+
+    def program_name(self):
+        return self.program.slug if self.program_id is not None else ""
+
+    def addActivitiesFromProgram(self, program_id):
+        programActivities = ProgramActivity.objects.filter(
+            program_id=program_id)
+        if len(programActivities) > 0:
+            for activity in programActivities:
+                init_at = deadline_in_business_days(
+                    self.date, activity.days, [5, 6])
+                future = Annotation.objects.create(
+                    text=f"RECORDATORIO {self.text}",
+                    date=init_at,
+                    type=1,
+                    patern_annotation_id=self.id,
+                    user_id=self.user_id,
+                    program=activity.program
+                )
+                future.save()

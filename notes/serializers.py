@@ -86,10 +86,19 @@ class PaymentSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
+    #  program = ProgramSerializer(required=False)
+    program_id = serializers.IntegerField(required=False, allow_null=True)
+
     class Meta:
         model = models.Annotation
         fields = ['created_at', 'text', 'date',
-                  'reviewed_at', 'type', 'user_id', 'id']
+                  'reviewed_at', 'type', 'user_id', 'id',
+                  'program_name', 'program_id'
+                  ]
+        read_only_fields = ['program_name']
+
+    #  def get_validation_exclusions(self):
+    #      return ['program_id']
 
     #  def create(self, validated_data):
     #      instance = models.Annotation(**validated_data)

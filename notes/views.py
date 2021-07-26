@@ -9,6 +9,10 @@ from django.http import HttpResponse
 from datetime import datetime
 from django.db.models import F
 from rest_framework.renderers import JSONRenderer
+from rest_framework.decorators import api_view
+from cryptography.fernet import Fernet
+from django.conf import settings
+from pathlib import Path
 
 # Create your views here.
 
@@ -139,25 +143,65 @@ class NoteViewSet(viewsets.ModelViewSet):
 
 
 class AnnotationViewSet(viewsets.ModelViewSet):
-    queryset = models.Annotation.objects.all().filter(deleted_at__isnull=True)
+    """
+    Apuntes, en el caso la peticion contenga 
+    """
+    queryset = models.Annotation.objects.all().filter(
+        deleted_at__isnull=True).order_by('-date')
     serializer_class = serializers.AnnotationSerializer
     permission_classes = [permissions.IsAuthenticated]
     filterset_fields = ['date', 'type']
     search_fields = ['text', 'date']
 
-    #  def create(self, request):
-        #  serializer = serializers.AnnotationSerializer(data=request.data)
-        #  print("✅ gaa cuchito")
-        #  # print(serializer.data
-        #  serializer.is_valid()
-        #  serializer.save()
-        #  print("✅ aguia")
-        #  response = Response()
-        #  response.status_code = 201
-        #  return response
+    def create(self, request):
+        print("aqui la prueba 🤡")
+        print(request.data.get("program_id"))
+        serializer = serializers.AnnotationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        if request.data.get('program_id') is not None and request.data['program_id'] > 0:
+            #  print("estoy aqui chamo 🤡")
+            #  print(request.data['program_id'])
+            instance.addActivitiesFromProgram(request.data['program_id'])
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        print("aqui la prueba 🤡")
+        print(request.data.get("program_id"))
+        print(type(request.data.get("program_id")))
+        serializer = serializers.AnnotationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        preview = models.Annotation.objects.get(pk=pk)
+        if preview.program_id is None and request.data.get('program_id') is not None:
+            preview.addActivitiesFromProgram(request.data['program_id'])
+        instance = serializer.save()
+        return Response(serializer.data)
 
     def destroy(self, request, pk=None):
         row = models.Annotation.objects.get(pk=pk)
         row.deleted_at = datetime.now()
         row.save()
         return HttpResponse('')
+
+
+
+@api_view(['GET', 'POST'])
+def encrypt_db(request):
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    if request.method == 'GET':
+        key = Fernet.generate_key()
+        response = HttpResponse(key, content_type="application/x-iwork-keynote-sffkey")
+        response['Content-Disposition'] = 'attachment; filename="key.key"'
+        return response
+        #  return Response({"message": "Hola amigo como estas, es la hora de jugar!"})
+    elif request.method == 'POST':
+        #  "application/vnd.sqlite3"
+        key = open(BASE_DIR / "uploads/key.key", "rb").read()
+        f = Fernet(key)
+        with open(BASE_DIR / "db.sqlite3", "rb") as file:
+            file_data = file.read()
+            encrypted_data = f.encrypt(file_data)
+            with open(BASE_DIR / "db.bin", "wb") as output_file:
+                output_file.write(encrypted_data)
+                output_file.close()
+        return Response({"message": "He encriptado la informacion"})
