@@ -18,20 +18,20 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name']
 
 
-class ContactSerializer(serializers.HyperlinkedModelSerializer):
+class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Contact
         fields = ['id', 'created_at', 'name',
-                  'phone_number', 'email', 'address', 'dni', 'url']
+                  'phone_number', 'email', 'address', 'dni']
 
 
-class ProgramSerializer(serializers.HyperlinkedModelSerializer):
+class ProgramSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Program
         fields = ['id', 'created_at', 'slug', 'name']
 
 
-class ProgramActivitySerializer(serializers.HyperlinkedModelSerializer):
+class ProgramActivitySerializer(serializers.ModelSerializer):
     program_id = serializers.IntegerField()
 
     class Meta:
@@ -48,14 +48,14 @@ class ProgramActivitySerializer(serializers.HyperlinkedModelSerializer):
 #          fields = ['id', 'note_id', 'payment_id']
 
 
-class NoteSerializer(serializers.HyperlinkedModelSerializer):
+class NoteSerializer(serializers.ModelSerializer):
     contact_id = serializers.IntegerField()
     program_id = serializers.IntegerField(allow_null=True)
     contact = ContactSerializer(many=False, read_only=True)
 
     class Meta:
         model = models.Note
-        fields = ['id', 'url', 'created_at', 'text', 'contact_id',
+        fields = ['id', 'created_at', 'text', 'contact_id',
                   'amount', 'amount_paid', 'program_slug',
                   'program_id', 'contact', 'init_at', 'ends_at', 'type_label']
         read_only_fields = ['program_slug', 'contact', 'type_label']
@@ -67,7 +67,7 @@ class NoteSerializer(serializers.HyperlinkedModelSerializer):
         return note
 
 
-class PaymentSerializer(serializers.HyperlinkedModelSerializer):
+class PaymentSerializer(serializers.ModelSerializer):
     contact_id = serializers.IntegerField()
     note_id = serializers.IntegerField()
 
