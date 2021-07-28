@@ -18,19 +18,18 @@ from django.urls import path, include
 from django.conf.urls import url
 from expo_agency.api_routes import router as expo_agency_routes
 from expo_agency.views import get_current_client
-from notes.api_urls import router as notes_api_routes
+from notes.api_urls import urls as notes_urls
 from notes.views import encrypt_db
 from django.conf.urls.static import static
 from django.conf import settings
-
 
 
 urlpatterns = [
     #  path('', views.index),
     # login de la vista del api
     path('api-auth/', include('rest_framework.urls')),
-    path('api/', include(notes_api_routes.urls)),
-    path('api/encrypt_db', encrypt_db),
+    path('api/', include(notes_urls)),
+    #  path('api/encrypt_db', encrypt_db),
     path('api_expo_agency/clients/me/', get_current_client),
     #  path('api_expo_agency/me/', get_current_user),
     path('api_expo_agency/', include(expo_agency_routes.urls)),
@@ -40,3 +39,4 @@ urlpatterns = [
     # REST AUTH SYSTEM ref: https://djoser.readthedocs.io/en/latest/token_endpoints.html
     url(r'^api/auth/', include('djoser.urls.authtoken')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

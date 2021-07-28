@@ -9,11 +9,12 @@ from django.http import HttpResponse
 from datetime import datetime
 from django.db.models import F
 from rest_framework.renderers import JSONRenderer
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from cryptography.fernet import Fernet
 from django.conf import settings
 from pathlib import Path
-
+import os
+import logging
 # Create your views here.
 
 
@@ -144,7 +145,7 @@ class NoteViewSet(viewsets.ModelViewSet):
 
 class AnnotationViewSet(viewsets.ModelViewSet):
     """
-    Apuntes, en el caso la peticion contenga 
+    Apuntes, en el caso la peticion contenga
     """
     queryset = models.Annotation.objects.all().filter(
         deleted_at__isnull=True).order_by('-date')
@@ -184,18 +185,22 @@ class AnnotationViewSet(viewsets.ModelViewSet):
         return HttpResponse('')
 
 
-
 @api_view(['GET', 'POST'])
+@permission_classes([permissions.IsAuthenticated])
 def encrypt_db(request):
     BASE_DIR = Path(__file__).resolve().parent.parent
     if request.method == 'GET':
-        key = Fernet.generate_key()
-        response = HttpResponse(key, content_type="application/x-iwork-keynote-sffkey")
-        response['Content-Disposition'] = 'attachment; filename="key.key"'
-        return response
-        #  return Response({"message": "Hola amigo como estas, es la hora de jugar!"})
+        #  generate key and return
+        #  key = Fernet.generate_key()
+        #  response = HttpResponse(key, content_type="application/x-iwork-keynote-sffkey")
+        #  response['Content-Disposition'] = 'attachment; filename="key.key"'
+        #  return response
+        return Response({"message": "Hola amigo como estas, es la hora de jugar!"})
     elif request.method == 'POST':
-        #  "application/vnd.sqlite3"
+        if not os.path.exists(BASE_DIR / "db.sqlite3"):
+            return Response({"message": "Servicio no disponible"}, status=503)
+        if not os.path.exists(BASE_DIR / "uploads/key.key"):
+            return Response({"message": "No tienes una clave para encriptado"}, status=503)
         key = open(BASE_DIR / "uploads/key.key", "rb").read()
         f = Fernet(key)
         with open(BASE_DIR / "db.sqlite3", "rb") as file:
@@ -204,4 +209,36 @@ def encrypt_db(request):
             with open(BASE_DIR / "db.bin", "wb") as output_file:
                 output_file.write(encrypted_data)
                 output_file.close()
+                os.unlink(BASE_DIR / "db.sqlite3")
+                os.unlink(BASE_DIR / "uploads/key.key")
         return Response({"message": "He encriptado la informacion"})
+
+
+# Esta vista esta autorizada de forma anonima
+@api_view(['GET', 'POST'])
+@authentication_classes([])
+@permission_classes([])
+def restore_db(request):
+    if request.method == "GET":
+        return Response({"message": "no deberias ver esto 😐"})
+    try:
+        BASE_DIR = Path(__file__).resolve().parent.parent
+        if os.path.exists(BASE_DIR / "db.sqlite3") and Path(BASE_DIR / "db.sqlite3").stat().st_size > 0:
+            return Response({"message": "Ya se recupero la informacion"})
+        key_uploaded = request.FILES['key']
+        key = key_uploaded.read()
+        f = Fernet(key)
+        encrypted_data = open(BASE_DIR / "db.bin", "rb").read()
+        decrypted_data = f.decrypt(encrypted_data)
+        db_file = open("db.sqlite3", "wb")
+        db_file.write(decrypted_data)
+        db_file.close()
+        with open(BASE_DIR / "uploads/key.key", "wb") as key_file:
+            key_file.write(key)
+    #  except Exception as error:
+    except:
+        logging.error(
+            "error al realizar el desencriptado, quizas la llave no es la correcta")
+        #  logging.error(error)
+        return Response({"message": "algo malio sal 🤡"}, status=500)
+    return Response({"message": "desencriptado"})

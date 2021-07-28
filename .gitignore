@@ -3,3 +3,4 @@ db.sqlite3
 **.swp
 .session.vim
 node_modules
+db.bin
