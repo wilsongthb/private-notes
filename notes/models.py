@@ -52,7 +52,7 @@ class Contact(BaseModel):
 class Program(BaseModel):
     """ Conjunto de actividades """
     slug = models.CharField(max_length=15,
-                            validators=[validate_slug],
+                            #  validators=[validate_slug],
                             help_text="Nombre en clave")
     name = models.CharField(max_length=255, help_text="Nombre decriptivo")
 
