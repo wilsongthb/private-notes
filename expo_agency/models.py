@@ -81,7 +81,7 @@ class TourActivity(BaseModel):
     Cambios:
         - Aumentado limite de longitud actividad de 255 a 500
     """
-    activity = models.CharField(max_length=500)
+    activity = models.TextField(max_length=500)
     time = models.CharField(max_length=10)  # HH:mma
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name='activities')
