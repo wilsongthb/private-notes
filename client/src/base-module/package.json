@@ -1,0 +1,39 @@
+{
+  "name": "m31-base-module",
+  "version": "1.10.0",
+  "description": "Componentes base para aplicaciones vue de wilsongthb",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wilsongthb/m31-base-module.git"
+  },
+  "dependencies": {
+    "bootstrap-vue": "^2.5.0",
+    "jquery": "^3.4.1",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "number-formatter": "^1.2.0",
+    "rxjs": "^6.5.4",
+    "vue-select": "^3.4.0",
+    "vuejs-datepicker": "^1.6.2"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "^4.2.2",
+    "eslint": "^7.4.0",
+    "eslint-plugin-vue": "^6.2.2",
+    "node-sass": "^4.13.1",
+    "sass-loader": "^8.0.2",
+    "vue": "^2.6.11",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "vue-cli-service serve demo/main.js"
+  },
+  "author": "M31",
+  "license": "ISC"
+}
