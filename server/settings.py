@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'notes',
     'django_seed',
     'django_extensions',
-    'expo_agency',
     #  'customuser'
 ]
 
